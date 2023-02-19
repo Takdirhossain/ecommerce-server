@@ -15,9 +15,13 @@ router.post("/newproducts", verify, async (req, res) => {
   } else {
     res.status(401).json("You are not authorized")
   }
-
-
 });
+
+//update stock
+router.put("/products/:productid", async(req, res) => {
+  const {productId} = req.params
+})
+
 
 //get all products
 router.get("/newproducts", async (req, res) => {
@@ -42,11 +46,11 @@ router.get("/latest", async (req, res) => {
 //get random products
 router.get('/products/random', async (req, res) => {
   try {
-    const products = await NewProduct.aggregate([{ $sample: { size: 2 } }]);
-    res.status(200).json(products);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    const agreegation = await NewProduct.aggregate([{ $sample: { size: 2 } }])
+    res.status(201).json(agreegation)
+  } catch {
+    res.status(401).json("Something wrong here")
+
   }
 });
 module.exports = router;
