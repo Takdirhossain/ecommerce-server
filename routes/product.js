@@ -2,9 +2,8 @@ const router = require("express").Router();
 const NewProduct = require("../models/Products");
 const verify = require("../verifyToken");
 
-router.post("/newproducts", verify, async (req, res) => {
-  if (req.user.isAdmin) {
-
+router.post("/newpost",  verify, async (req, res) => {
+   if(req.user){
     try {
       const product = new NewProduct(req.body);
       await product.save();
@@ -12,24 +11,38 @@ router.post("/newproducts", verify, async (req, res) => {
     } catch {
       res.status(500).json("Somethis wrong here");
     }
-  } else {
-    res.status(401).json("You are not authorized")
-  }
+   }
+  
 });
-
-//update stock
-router.put("/products/:productid", async(req, res) => {
-  const {productId} = req.params
+router.delete("/posts/:id", verify, async(req,res) => {
+  try{
+    const post = await NewProduct.findById(req.params.id)
+    if(!post){
+      return res.status(404).json("Post not found")
+    }
+    if(post.userid !== req.user.id){
+      res.status(403).json("you are not authenticate")
+    }
+    await NewProduct.remove()
+    res.json("Post hasbeen delete")
+  } catch{
+    res.status(404).json("SOmething wrong")
+  }
 })
 
 
-//get all products
-router.get("/newproducts", async (req, res) => {
+router.post("/:id/like", async (req, res) => {
+  const { id } = req.params;
   try {
-    const product = await NewProduct.find({});
-    res.status(201).json(product);
-  } catch {
-    res.status(501).json("Somethis wrong at here ");
+    const product = await NewProduct.findById(id);
+    if (!product) {
+      return res.status(404).json("Product not found");
+    }
+    product.like++; // Increment the likes field by 1
+    const savedProduct = await product.save();
+    res.status(200).json(savedProduct);
+  } catch (error) {
+    res.status(500).json(error);
   }
 });
 
@@ -43,14 +56,5 @@ router.get("/latest", async (req, res) => {
   }
 });
 
-//get random products
-router.get('/products/random', async (req, res) => {
-  try {
-    const agreegation = await NewProduct.aggregate([{ $sample: { size: 2 } }])
-    res.status(201).json(agreegation)
-  } catch {
-    res.status(401).json("Something wrong here")
 
-  }
-});
 module.exports = router;

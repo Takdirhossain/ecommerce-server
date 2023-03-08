@@ -12,7 +12,13 @@ router.post("/regsiter", async (req, res) => {
   });
   try {
     const user = await newuser.save();
-    res.status(201).json(user);
+    const accessToken = jwt.sign(
+      { id: user._id, isAdmin: user.isAdmin },
+      "hellotakdir",
+      { expiresIn: "5d" }
+    );
+    res.status(201).json({user, accessToken});
+    
   } catch {
     res.status(500).json(err.message);
   }
