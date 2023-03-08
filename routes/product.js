@@ -46,6 +46,16 @@ router.post("/:id/like", async (req, res) => {
   }
 });
 
+router.get("/:userid", async(req, res) => {
+  const userid = req.params.userid;
+  const query = { userid: userid };
+  try{
+const userpost = await NewProduct.find(query)
+res.status(200).json(userpost)
+  }catch{
+
+  }
+})
 //get latest product 
 router.get("/latest", async (req, res) => {
   try {

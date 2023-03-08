@@ -6,6 +6,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const auth = require("./routes/auth");
 const addproduct = require("./routes/product")
+const category = require("./routes/category")
 app.use(express.json());
 app.use(cors());
 
@@ -22,6 +23,7 @@ mongoose
   });
 app.use("/api/auth", auth);
 app.use("/api/auth", addproduct)
+app.use("/api/auth", category)
 app.use("/", (req, res) => {
   res.send("This is server is runing efesf");
 });
